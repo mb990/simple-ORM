@@ -28,11 +28,11 @@ class Model
 
 	}
 
-	public function orderBy() {
+	public function orderBy($var, $order) {
 
 	}
 
-	public function limit() {
+	public function limit($limit) {
 
 	}
 

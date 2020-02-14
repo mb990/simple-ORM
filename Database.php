@@ -2,26 +2,19 @@
 
 class Database {
 
-	private $host = 'mysql';
-	private $user = 'admin';
-	private $password = 'admin';
-	private $db = 'simpleORM';
+	private static $host = 'mysql';
+	private static $user = 'admin';
+	private static $password = 'admin';
+	private static $db = 'simpleORM';
+	private static $pdo;
 
-	
-	public function connection() {
-		try {
+	public static function connect() {
 
-			$dsn = "mysql:host=" . $this->host . ";dbname=" . $this->db . ";";
-			$pdo = new PDO($dsn, $this->user, $this->password);
-			$pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-    		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		$dsn = "mysql:host=" . self::$host . ";dbname=" . self::$db . ";";
+		self::$pdo = new PDO($dsn, self::$user, self::$password);
+		self::$pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+		self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    		return $pdo;
-
-  		}   
-		catch(PDOException $e) {
-    		die("ERROR: Could not connect. " . $e->getMessage());
-  			}
+		return self::$pdo;
 	}
-
 }

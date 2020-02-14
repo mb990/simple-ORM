@@ -11,13 +11,14 @@ class UserModel extends Model
 	public $lastName;
 	public $age;
 	protected $table = 'users';	
+	public static $id;
+
+	public static $query = [];
 
 	public function save() {
 
-		$db = new Database();
-
 		$sql = 'INSERT INTO users (firstName, lastName, age) VALUES (:firstName, :lastName, :age)';
-		$stmt = $db->connection()->prepare($sql);
+		$stmt = Database::connect()->prepare($sql);
 		$stmt->BindParam(':firstName', $this->firstName, PDO::PARAM_STR);
 		$stmt->BindParam(':lastName', $this->lastName, PDO::PARAM_STR);
 		$stmt->BindParam(':age', $this->age, PDO::PARAM_STR);
@@ -35,34 +36,88 @@ class UserModel extends Model
 
 	public static function find($id) {
 
-		$db = new Database();
-
 		$sql = "SELECT * FROM users WHERE users.id = '$id' ";
-		$stmt = $db->connection()->prepare($sql);
+		$stmt = Database::connect()->prepare($sql);
 		$stmt->execute();
 
 		$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-		foreach ($results as $row) {
-			echo 'first name: ' . $row['firstName'] . '<br>';
-			echo 'last name: ' . $row['lastName'] . '<br>';
-			echo 'age: ' . $row['age'] . '<br>';
-		}
+		self::$id = $results[0]["id"];
+
+		return $results;
+
 	}
 
 	public function update($user = []) {
 
-		$db = new Database();
+		$name = $user["name"];
 
-	}
+		$id = self::$id;
 
-	public static function select($var) {
-		echo $var . '<br>';
+		$sql = "UPDATE users SET users.firstName = '$name' WHERE users.id = '$id' ";
+
+		$stmt = Database::connect()->prepare($sql);
+
+		$stmt->execute();
+
+		echo 'nesto';
+
 		return $this;
 	}
 
-	public function where(string $field, string $symbol, int $value) {
-		return 'WHERE "$field" "$symbol" "$value"';
-		echo 'where';
+	public static function select($var) {
+		
+		self::$query[] = 'SELECT ' . $var . ' FROM users WHERE';
+
+		return new self;
+	}
+
+	public function where($field, $symbol, $value) {
+
+		self::$query[] = ' users.' . $field . ' ' .$symbol . ' ' . $value . ' ';
+		self::$query[] = 'AND ';
+	
+		if ($var) {
+			array_pop(self::$query);
+		}
+
+		return $this;
+	}
+
+	public function join() {
+
+		return $this;
+	}
+
+	public function orderBy($var, $order) {
+		
+		self::$query[] = 'ORDER BY users.' . $var . ' ' . $order . ' '; 
+
+		return $this;
+	}
+
+	public function limit($limit) {
+		
+		self::$query[] = ' LIMIT ' . $limit;
+
+		return $this;
+	}
+
+	public function get() {
+		
+		$sql = implode(" ", self::$query);
+		echo ($sql) . '<br>';
+		$stmt = Database::connect()->prepare($sql);
+		$stmt->execute();
+
+		$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+		foreach ($results as $key => $value) {
+			echo 'first name: ' . $value['firstName'] . '<br>';
+			echo 'last name: ' . $value['lastName'] . '<br>';
+			echo 'age: ' . $value['age'] . '<br>';
+		}
+
+		return $results;
 	}
 }

@@ -6,22 +6,27 @@ $user = new UserModel();
 $user->firstName = 'Snoop';
 $user->lastName = 'Dogg';
 $user->age = 48;
-$user->save();
+// $user->save();
 
-$user = UserModel::find(83);
+$snoopDogg = UserModel::find(84);
 
-$user = UserModel::select('*')->where('age', '<', 45);
+$snoopDogg = new UserModel();
+
+// $snoopDogg->update(['name' => 'Snoopy'])->select('*');
 
 // $user->update(['firstName' => 'ime']);
 
 // // Fetching
-// $people = UserModel
-//     ::select('*')
-//     ->where('age', '>', 40)
-//     ->where('age', '<', 50)
-//     ->orderBy('age', 'desc')
-//     ->limit(5)
-//     ->get();
+$people = new UserModel();
+
+$people = UserModel
+    ::select('*')
+    ->where('age', '>', 40)
+    ->where('age', '<', 50)
+    ->where('firstName', '=', 'Snoop')
+    ->orderBy('age', 'desc')
+    ->limit(5)
+    ->get();
 
 // // Find by id
 // $snoopDogg = UserModal::find(3);
