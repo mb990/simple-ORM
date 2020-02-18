@@ -2,40 +2,39 @@
 
 require_once 'UserModel.php';
 
-$user = new UserModel();
-$user->firstName = 'Snoop';
-$user->lastName = 'Dogg';
-$user->age = 48;
-// $user->save();
+//$user = new UserModel();
+//$user->setFirstName('Snoop');
+//$user->setLastName('Dogg');
+//$user->setAge(48);
+//$user->save();
 
-$snoopDogg = UserModel::find(84);
-
-$snoopDogg = new UserModel();
-
-// $snoopDogg->update(['name' => 'Snoopy'])->select('*');
-
-// $user->update(['firstName' => 'ime']);
+//$snoopDogg = UserModel::find(5);
+//
+//$snoopDogg = new UserModel();
+//
+//$snoopDogg->update(['lastName' => 'New last name']);
 
 // // Fetching
-$people = new UserModel();
+// $people = new UserModel();
 
-$people = UserModel
-    ::select('*')
-    ->where('age', '>', 40)
-    ->where('age', '<', 50)
-    ->where('firstName', '=', 'Snoop')
-    ->orderBy('age', 'desc')
-    ->limit(5)
-    ->get();
+// $people = UserModel
+//    ::select('*')
+//    ->where('age', '>', 40)
+//    ->where('age', '<', 50)
+// //    ->where('lastName', '=', 'Dogg')
+//    ->orderBy('age', 'desc')
+//    ->limit(5)
+//    ->get();
+// echo '<br>';
 
 // // Find by id
-// $snoopDogg = UserModal::find(3);
+// $snoopDogg = UserModel::find(3);
 
 // // Update
 // $snoopDogg->update(['name' => 'Snoopy']);
 
-// // Joining
-// $usersWithPets = UserModel
-//     ::select('users.name, pets.name')
-//     ->join('pets', 'pets.user_id', '=', 'users.id')
-//     ->get();
+ // Joining
+ $usersWithPets = UserModel
+ 	 ::select('users.firstName, pets.name')
+     ->join('pets', 'pets.user_id', '=', 'users.id')
+     ->get();

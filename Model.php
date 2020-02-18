@@ -16,7 +16,7 @@ class Model
 
 	}
 
-	public function update($user = []) {
+	public function update($data = []) {
 
 	}
 
@@ -36,11 +36,12 @@ class Model
 
 	}
 
-	public function get() {
+	public function join($table, $field1, $symbol, $field2) {
 
 	}
 
-	public function join() {
+    public function get() {
 
-	}
+    }
+
 }

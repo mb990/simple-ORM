@@ -8,7 +8,7 @@ class Database {
 	private static $db = 'simpleORM';
 	private static $pdo;
 
-	public static function connect() {
+	private static function setConnection() {
 
 		$dsn = "mysql:host=" . self::$host . ";dbname=" . self::$db . ";";
 		self::$pdo = new PDO($dsn, self::$user, self::$password);
@@ -17,4 +17,8 @@ class Database {
 
 		return self::$pdo;
 	}
+
+	public static function connect() {
+	    return self::setConnection();
+    }
 }

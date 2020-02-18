@@ -7,21 +7,74 @@ require_once('Model.php');
  */
 class UserModel extends Model
 {
-	public $firstName;
-	public $lastName;
-	public $age;
-	protected $table = 'users';	
-	public static $id;
+	private $firstName;
+	private $lastName;
+	private $age;
+	protected static $table = 'users';
+	private static $id;
 
 	public static $query = [];
+
+	public $counter = 0;
+
+	public $field;
+	public $value;
+
+    /**
+     * @param mixed $firstName
+     */
+    public function setFirstName($firstName)
+    {
+        $this->firstName = $firstName;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFirstName()
+    {
+        return $this->firstName;
+    }
+
+    /**
+     * @param mixed $lastName
+     */
+    public function setLastName($lastName)
+    {
+        $this->lastName = $lastName;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLastName()
+    {
+        return $this->lastName;
+    }
+
+    /**
+     * @param mixed $age
+     */
+    public function setAge($age)
+    {
+        $this->age = $age;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAge()
+    {
+        return $this->age;
+    }
 
 	public function save() {
 
 		$sql = 'INSERT INTO users (firstName, lastName, age) VALUES (:firstName, :lastName, :age)';
 		$stmt = Database::connect()->prepare($sql);
-		$stmt->BindParam(':firstName', $this->firstName, PDO::PARAM_STR);
-		$stmt->BindParam(':lastName', $this->lastName, PDO::PARAM_STR);
-		$stmt->BindParam(':age', $this->age, PDO::PARAM_STR);
+		$stmt->BindParam(':firstName', $this->getFirstName(), PDO::PARAM_STR);
+		$stmt->BindParam(':lastName', $this->getLastName(), PDO::PARAM_STR);
+		$stmt->BindParam(':age', $this->getAge(), PDO::PARAM_STR);
 
 		$stmt->execute();
 
@@ -36,7 +89,7 @@ class UserModel extends Model
 
 	public static function find($id) {
 
-		$sql = "SELECT * FROM users WHERE users.id = '$id' ";
+		$sql = "SELECT * FROM " . self::$table .  " WHERE users.id = '$id'";
 		$stmt = Database::connect()->prepare($sql);
 		$stmt->execute();
 
@@ -44,54 +97,60 @@ class UserModel extends Model
 
 		self::$id = $results[0]["id"];
 
-		return $results;
+		echo 'Data for id: <strong>' . self::$id . '</strong><br>';
 
+		foreach ($results as $row) {
+		    echo 'First name: ' . $row['firstName'] . '<br>';
+		    echo 'Last name: ' . $row['lastName'] . '<br>';
+		    echo 'Age: ' . $row['age'] . '<br>';
+        }
+
+//		return $results;
 	}
 
-	public function update($user = []) {
-
-		$name = $user["name"];
+	public function update($data = []) {
 
 		$id = self::$id;
 
-		$sql = "UPDATE users SET users.firstName = '$name' WHERE users.id = '$id' ";
+		echo $sql = "UPDATE " . self::$table . " SET " . self::$table . "." . key($data) . " = '" . $data[key($data)] . "' WHERE " . self::$table .".id = '$id' ";
 
 		$stmt = Database::connect()->prepare($sql);
 
 		$stmt->execute();
-
-		echo 'nesto';
 
 		return $this;
 	}
 
 	public static function select($var) {
 		
-		self::$query[] = 'SELECT ' . $var . ' FROM users WHERE';
+		self::$query[] = 'SELECT ' . $var . ' FROM '. self::$table;
 
 		return new self;
 	}
 
 	public function where($field, $symbol, $value) {
 
-		self::$query[] = ' users.' . $field . ' ' .$symbol . ' ' . $value . ' ';
-		self::$query[] = 'AND ';
-	
-		if ($var) {
-			array_pop(self::$query);
-		}
+	    if ($this->counter < 1) {
+            self::$query[] = ' WHERE ' . self::$table . '.' . $field . ' ' . $symbol . ' ' . $value;
+            $this->counter ++;
+        }
+        else {
+            self::$query[] = 'AND ' . self::$table . '.' . $field . ' ' . $symbol . ' ' . $value;
+        }
 
-		return $this;
+        return $this;
 	}
 
-	public function join() {
+	public function join($table, $field1, $symbol, $field2) {
+
+        self::$query [] = ' INNER JOIN ' . "$table" . ' ON ' . "$field1" . "$symbol" . "$field2" . '<br>';
 
 		return $this;
 	}
 
 	public function orderBy($var, $order) {
 		
-		self::$query[] = 'ORDER BY users.' . $var . ' ' . $order . ' '; 
+		self::$query[] = 'ORDER BY ' . self::$table . '.' . $var . ' ' . $order . ' ';
 
 		return $this;
 	}
@@ -105,19 +164,35 @@ class UserModel extends Model
 
 	public function get() {
 		
-		$sql = implode(" ", self::$query);
-		echo ($sql) . '<br>';
-		$stmt = Database::connect()->prepare($sql);
-		$stmt->execute();
+		echo $sql = implode(" ", self::$query);
+		echo '<br>';
+		try {
+				
+			$stmt = Database::connect()->prepare($sql);
+			$stmt->execute();
 
-		$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+			$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-		foreach ($results as $key => $value) {
-			echo 'first name: ' . $value['firstName'] . '<br>';
-			echo 'last name: ' . $value['lastName'] . '<br>';
-			echo 'age: ' . $value['age'] . '<br>';
+			for ($i = 0; $i < count($results); $i++) {
+
+	            if (key($results) == 'firstName') {
+	                echo 'First name: ' . $results[$i]['firstName'] . '<br>';
+	            }
+	            if (key($results) == 'lastName') {
+	                echo 'Last name: ' . $results[$i]['lastName'] . '<br>';
+	            }
+	            if (key($results) == 'age') {
+	                echo 'Age: ' . $results[$i]['age'] . '<br>';
+	            }
+	        }
+	        echo 123;
+	        var_dump($results);
+
+			return $results;
 		}
-
-		return $results;
+		catch (Exception $e) {
+			echo 'Error';
+			var_dump($e);
+		}
 	}
 }
