@@ -1,12 +1,21 @@
 <?php
 
+include "autoload.php";
+
 class Database {
+
+	// private static $host = env('DB_HOST');
+	// private static $user = env('DB_USERNAME');
+	// private static $password = env('DB_PASSWORD');
+	// private static $db = env('DB_NAME');
+	// private static $pdo;
 
 	private static $host = 'mysql';
 	private static $user = 'admin';
 	private static $password = 'admin';
 	private static $db = 'simpleORM';
 	private static $pdo;
+
 
 	private static function setConnection() {
 
