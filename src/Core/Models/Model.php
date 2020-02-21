@@ -1,6 +1,9 @@
 <?php
 
-require_once('Database.php');
+namespace Core\Models;
+
+use Core\Database\Database;
+use \PDO;
 
 /**
  * 
@@ -40,8 +43,7 @@ class Model
 
 		try {
 			
-			echo $sql = 'INSERT INTO ' . static::$table . ' (' . implode(", ", array_keys($this->values)) . ') VALUES (:' . implode(", :", array_keys($this->values)) . ')';
-			echo '<br>';
+			$sql = 'INSERT INTO ' . static::$table . ' (' . implode(", ", array_keys($this->values)) . ') VALUES (:' . implode(", :", array_keys($this->values)) . ')';
 			 
 			$stmt = Database::connect()->prepare($sql);
 
@@ -50,6 +52,8 @@ class Model
 			}
 
 			$stmt->execute();
+
+			echo 'entry added <br>';
 		}
 		catch(PDOException $e) {
 			echo 'Error: ' . $e->getMessage();
@@ -67,10 +71,15 @@ class Model
 
 		self::$id = $results[0]['id'];
 
+		echo 'data: <br>';
+		foreach ($results[0] as $key => $value) {
+			echo $key . ': ' . $value . '<br>';
+		}
+
 		if (count($results) == 0) {
 			return null;
 		}
-		echo '<br>' . $sql . '<br>';
+		
 		return new static ($results[0]);
 	}
 
@@ -84,7 +93,7 @@ class Model
 
 		$stmt->execute();
 
-		echo '<br>' . $sql . '<br>';
+		echo 'data updated <br>';
 
 		return $this;
 	}
@@ -134,9 +143,11 @@ class Model
 
 		echo $sql = implode(" ", $this->query);
 		echo '<br>';
+
 		try {
-				
+			
 			$stmt = Database::connect()->prepare($sql);
+			
 			$stmt->execute();
 
 			$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -144,7 +155,7 @@ class Model
 			return $results;
 		}
 		catch (PDOException $e) {
-			// echo 'Error' . $e->getMessage() . '<br>';
+			echo 'Error' . $e->getMessage() . '<br>';
 		}
 	}
 
